@@ -28,12 +28,12 @@ public class ConnectToRedis {
         System.out.println(testMap.put("four", 4));
         System.out.println(testMap.put("five", 5));
         System.out.println(testMap.put("six", 0));
-        printMap(testMap);
+        printMap(testMap, "RedisMap");
         Collection<Integer> testSet = testMap.values();
         printSet(testSet);
         System.out.println("retainAll " + testSet.retainAll(Arrays.asList(0, 4)));
         printSet(testSet);
-        printMap(testMap);
+        printMap(testMap, "RedisMap");
         connection.close();
     }
     static void printSet(Collection inpSet) {
@@ -42,9 +42,9 @@ public class ConnectToRedis {
         System.out.println("**********/Set*************");
     }
 
-    static void printMap(Map inpMap) {
-        System.out.println("**********Map*************");
-        inpMap.values().stream().forEach(System.out::println);
-        System.out.println("**********/Map*************");
+    static void printMap(Map inpMap, String name) {
+        System.out.println("**********Map "+name + " *************");
+        inpMap.entrySet().stream().forEach(System.out::println);
+        System.out.println("**********/Map " + name + "*************");
     }
 }

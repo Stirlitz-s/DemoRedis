@@ -17,7 +17,7 @@ public class RedisIterator implements Iterator<Object> {
     private RedisConnection<String, Integer> connection;
 
     private int listLength;
-    private int p;
+    private int indexOfNext;
     private List<String> keys;
     private IteratorType type;
     
@@ -26,22 +26,22 @@ public class RedisIterator implements Iterator<Object> {
         this.connection = connection;
         this.type = type;
         this.keys = connection.keys("*");
-        this.p = 0;
+        this.indexOfNext = 0;
         this.listLength = keys.size();
     }
 
     @Override
     public boolean hasNext() {
-        return p < listLength ? true : false;
+        return indexOfNext < listLength ? true : false;
     }
 
     @Override
     public Object next() {
-        if (p == listLength) {
+        if (indexOfNext == listLength) {
             throw new NoSuchElementException();
         }
-        String key = keys.get(p);
-        p++;
+        String key = keys.get(indexOfNext);
+        indexOfNext++;
         switch (type) {
             case KEYSET:
                 return key;
@@ -56,7 +56,7 @@ public class RedisIterator implements Iterator<Object> {
     }
     
     public String getCurrentKey() {
-        return p == 0 ? keys.get(p) : keys.get(p - 1);
+        return indexOfNext == 0 ? keys.get(indexOfNext) : keys.get(indexOfNext - 1);
     }
 
     public int getListLength() {

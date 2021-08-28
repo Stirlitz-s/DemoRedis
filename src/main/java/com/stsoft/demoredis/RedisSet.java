@@ -21,19 +21,6 @@ public class RedisSet<T> implements Set<Object> {
     private RedisConnection<String, Integer> connection;
     private IteratorType type;
     
-    /*
-     * Default constructor creates connection to a local base
-     * redis://127.0.0.1:6379
-     * 
-     */    
-    public RedisSet() {
-        RedisClient redisClient = new RedisClient(
-        RedisURI.create("redis://127.0.0.1:6379"));
-        RedisCodec<String, Integer> redisCodec = new CodecStrInt(); 
-        RedisConnection<String, Integer> connection = redisClient.connect(redisCodec);
-        this.connection = connection;
-        this.type = type;
-    }
 
     public RedisSet(RedisConnection<String, Integer> connection, IteratorType type) {
         this.connection = connection;

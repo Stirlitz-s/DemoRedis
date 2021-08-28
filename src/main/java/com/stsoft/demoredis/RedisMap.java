@@ -22,22 +22,6 @@ public class RedisMap<K,V> implements Map<String, Integer> {
     private RedisSet<Integer> valuesSet;
     private RedisSet<Map.Entry<String, Integer>> entrySet;
 
-    /*
-     * Default constructor creates connection to a local base
-     * redis://127.0.0.1:6379
-     * 
-     */
-    public <K,V>RedisMap () {
-        RedisClient redisClient = new RedisClient(
-        RedisURI.create("redis://127.0.0.1:6379"));
-        RedisCodec<String, Integer> redisCodec = new CodecStrInt(); 
-        RedisConnection<String, Integer> connection = redisClient.connect(redisCodec);
-        this.connection = connection;
-        keySet = new RedisSet<String>(connection, IteratorType.KEYSET);
-        entrySet = new RedisSet<Map.Entry<String, Integer>>(connection, IteratorType.ENTRYSET);
-        valuesSet = new RedisSet<Integer>(connection, IteratorType.VALUES);
-        
-    }
     
     
     public <K,V>RedisMap (RedisConnection<String, Integer> connection) {
@@ -84,7 +68,7 @@ public class RedisMap<K,V> implements Map<String, Integer> {
     }
 
     public Set keySet() {
-        return new HashSet<String>(connection.keys("*"));
+        return keySet;
     }
 
     public Collection values() {
