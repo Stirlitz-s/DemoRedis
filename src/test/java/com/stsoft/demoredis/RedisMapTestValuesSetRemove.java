@@ -42,8 +42,8 @@ public class RedisMapTestValuesSetRemove {
         System.out.println(expected.put("five", 5));
         System.out.println(expected.put("six", 0));
         
-        Collection<Integer> actualKeySet = (Collection<Integer>) actual.values();
-        Collection<Integer> expectedKeySet = (Collection<Integer>) expected.values();
+        Collection<Integer> actualKeySet = actual.values();
+        Collection<Integer> expectedKeySet = expected.values();
         
         actualKeySet.remove(0);
         actualKeySet.remove(1);

@@ -20,7 +20,6 @@ public class ConnectToRedis {
 
         RedisMap<String, Integer> testMap = new RedisMap<>(connection);
         testMap.clear();
-     //   HashMap<String, Integer> testMap = new HashMap<>();
         System.out.println(testMap.put("zero", 0));
         System.out.println(testMap.put("one", 1));
         System.out.println(testMap.put("two", 2));
