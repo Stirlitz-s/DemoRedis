@@ -10,43 +10,53 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.lambdaworks.redis.KeyScanCursor;
 import com.lambdaworks.redis.RedisConnection;
+import com.lambdaworks.redis.ScanArgs;
 
-public class RedisIterator implements Iterator<Object> {
+public class RedisIterator<E> implements Iterator<Object> {
     
-    private RedisConnection<String, Integer> connection;
-
-    private int listLength;
-    private int indexOfNext;
-    private List<String> keys;
+    private RedisConnection<String, Object> connection;
     private IteratorType type;
+    private KeyScanCursor<String> cursor = null;
+    private String prevKey = null;
+    private ScanArgs scanArgs = null;
+    private int currentIndexOfList = 0;
     
     
-    public RedisIterator (RedisConnection<String, Integer> connection, IteratorType type) {
+    public RedisIterator (RedisConnection<String, Object> connection, IteratorType type) {
         this.connection = connection;
         this.type = type;
-        this.keys = connection.keys("*");
-        this.indexOfNext = 0;
-        this.listLength = keys.size();
+        this.scanArgs = ScanArgs.Builder.limit(10);
+        this.cursor = connection.scan(this.cursor, scanArgs);
     }
 
     @Override
     public boolean hasNext() {
-        return indexOfNext < listLength ? true : false;
+        if (cursor == null)
+            return false;
+        return !(cursor.isFinished() && (currentIndexOfList >= cursor.getKeys().size()));
     }
 
     @Override
     public Object next() {
-        if (indexOfNext == listLength) {
+        if (cursor.isFinished() && (currentIndexOfList >= cursor.getKeys().size())) {
             throw new NoSuchElementException();
         }
-        String key = keys.get(indexOfNext);
-        indexOfNext++;
+        
+        String key = cursor.getKeys().get(currentIndexOfList);
+        currentIndexOfList++;
+        if (currentIndexOfList >= cursor.getKeys().size() && !cursor.isFinished()) {
+            cursor = connection.scan(cursor, scanArgs);
+            currentIndexOfList = 0;
+        } 
+        prevKey = new String(key);
+        cursor = connection.scan(cursor, scanArgs);
         switch (type) {
             case KEYSET:
                 return key;
             case ENTRYSET:;
-                Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<>(key, connection.get(key));
+                Map.Entry<String, Object> entry = new AbstractMap.SimpleEntry<>(key, connection.get(key));
                 return entry;
             case VALUES:;
                 return connection.get(key);
@@ -56,12 +66,10 @@ public class RedisIterator implements Iterator<Object> {
     }
     
     public String getCurrentKey() {
-        return indexOfNext == 0 ? keys.get(indexOfNext) : keys.get(indexOfNext - 1);
+        return prevKey;
     }
 
     public int getListLength() {
-        return listLength;
-    }
-
-    
+        return connection.dbsize().intValue();
+    }    
 }

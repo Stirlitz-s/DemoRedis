@@ -4,25 +4,20 @@
  * 
  */
 package com.stsoft.demoredis;
-import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 
-import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisConnection;
-import com.lambdaworks.redis.RedisURI;
-import com.lambdaworks.redis.codec.RedisCodec;
 
 public class RedisSet<T> implements Set<Object> {
-    private RedisConnection<String, Integer> connection;
+    private RedisConnection<String, Object> connection;
     private IteratorType type;
     
 
-    public RedisSet(RedisConnection<String, Integer> connection, IteratorType type) {
+    public RedisSet(RedisConnection<String, Object> connection, IteratorType type) {
         this.connection = connection;
         this.type = type;
     }
@@ -43,11 +38,11 @@ public class RedisSet<T> implements Set<Object> {
             case KEYSET:;
                 return connection.exists((String) o);
             case ENTRYSET:;
-                return connection.exists(((Map.Entry<String, Integer>) o).getKey());
+                return connection.exists(((Map.Entry<String, Object>) o).getKey());
             case VALUES:;
                 RedisIterator iterator = (RedisIterator) iterator();
                 while (iterator.hasNext()) {
-                    if (((Integer)iterator.next()).equals((Integer)o)) {
+                    if ((iterator.next()).equals(o)) {
                         return true;
                     }
                 }
@@ -93,14 +88,14 @@ public class RedisSet<T> implements Set<Object> {
             case KEYSET:;
                 return connection.set((String) e, 0) != null;
             case ENTRYSET:;
-                 return connection.set(((Map.Entry<String, Integer>) e).getKey(),
-                         ((Map.Entry<String, Integer>) e).getValue()) != null;
+                 return connection.set(((Map.Entry<String, Object>) e).getKey(),
+                         ((Map.Entry<String, Object>) e).getValue()) != null;
             case VALUES:;
                 String key = UUID.randomUUID().toString();
                 while (!connection.exists(key)) {
                     key = UUID.randomUUID().toString();
                 }
-                return connection.set(key, (Integer) e) != null;
+                return connection.set(key, e) != null;
             default:
                 return false;
         }
@@ -112,11 +107,11 @@ public class RedisSet<T> implements Set<Object> {
         case KEYSET:
             return connection.del((String) o) != null;
         case ENTRYSET:
-             return connection.del(((Map.Entry<String, Integer>) o).getKey()) != null;
+             return connection.del(((Map.Entry<String, Object>) o).getKey()) != null;
         case VALUES:
             RedisIterator iterator = (RedisIterator) iterator();
             while (iterator.hasNext()) {
-                if (((Integer)iterator.next()).equals((Integer)o)) {
+                if ((iterator.next()).equals(o)) {
                     return connection.del(iterator.getCurrentKey()) != null;
                 }
             }
@@ -189,11 +184,11 @@ public class RedisSet<T> implements Set<Object> {
         }
     }
     
-    public RedisConnection<String, Integer> getConnection() {
+    public RedisConnection<String, Object> getConnection() {
         return connection;
     }
 
-    public void setConnection(RedisConnection<String, Integer> connection) {
+    public void setConnection(RedisConnection<String, Object> connection) {
         this.connection = connection;
     }
 

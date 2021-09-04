@@ -20,28 +20,28 @@ public class RedisMapTestValuesSetRemove {
     public void mapTestKeySetAddRemove() {
         RedisClient redisClient = new RedisClient(
         RedisURI.create("redis://127.0.0.1:6379"));
-        RedisCodec<String, Integer> redisCodec = new CodecStrInt(); 
-        RedisConnection<String, Integer> connection = redisClient.connect(redisCodec);
+        RedisCodec<String, Object> redisCodec = new CodecStrInt(); 
+        RedisConnection<String, Object> connection = redisClient.connect(redisCodec);
 
         RedisMap<String, Integer> actual = new RedisMap<>(connection);
         actual.clear();
-        System.out.println(actual.put("zero", 0));
-        System.out.println(actual.put("one", 1));
-        System.out.println(actual.put("two", 2));
-        System.out.println(actual.put("three", 3));
-        System.out.println(actual.put("four", 4));
-        System.out.println(actual.put("five", 5));
-        System.out.println(actual.put("six", 0));
+        actual.put("zero", 0);
+        actual.put("one", 1);
+        actual.put("two", 2);
+        actual.put("three", 3);
+        actual.put("four", 4);
+        actual.put("five", 5);
+        actual.put("six", 0);
         
         HashMap<String, Integer> expected = new HashMap<>();
-        System.out.println(expected.put("zero", 0));
-        System.out.println(expected.put("one", 1));
-        System.out.println(expected.put("two", 2));
-        System.out.println(expected.put("three", 3));
-        System.out.println(expected.put("four", 4));
-        System.out.println(expected.put("five", 5));
-        System.out.println(expected.put("six", 0));
-        
+        expected.put("zero", 0);
+        expected.put("one", 1);
+        expected.put("two", 2);
+        expected.put("three", 3);
+        expected.put("four", 4);
+        expected.put("five", 5);
+        expected.put("six", 0);
+       
         Collection<Integer> actualKeySet = actual.values();
         Collection<Integer> expectedKeySet = expected.values();
         

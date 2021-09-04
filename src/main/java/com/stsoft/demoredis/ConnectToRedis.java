@@ -15,18 +15,18 @@ public class ConnectToRedis {
     public static void main(String[] args) {
         RedisClient redisClient = new RedisClient(
         RedisURI.create("redis://127.0.0.1:6379"));
-        RedisCodec<String, Integer> redisCodec = new CodecStrInt(); 
-        RedisConnection<String, Integer> connection = redisClient.connect(redisCodec);
+        RedisCodec<String, Object> redisCodec = new CodecStrInt(); 
+        RedisConnection<String, Object> connection = redisClient.connect(redisCodec);
 
         RedisMap<String, Integer> testMap = new RedisMap<>(connection);
         testMap.clear();
-        System.out.println(testMap.put("zero", 0));
-        System.out.println(testMap.put("one", 1));
-        System.out.println(testMap.put("two", 2));
-        System.out.println(testMap.put("three", 3));
-        System.out.println(testMap.put("four", 4));
-        System.out.println(testMap.put("five", 5));
-        System.out.println(testMap.put("six", 0));
+        testMap.put("zero", 0);
+        testMap.put("one", 1);
+        testMap.put("two", 2);
+        testMap.put("three", 3);
+        testMap.put("four", 4);
+        testMap.put("five", 5);
+        testMap.put("six", 0);
         printMap(testMap, "RedisMap");
         Collection<Integer> testSet = testMap.values();
         printSet(testSet);

@@ -6,29 +6,24 @@
 
 package com.stsoft.demoredis;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
-//import java.util.*;
 import com.lambdaworks.redis.*;
-import com.lambdaworks.redis.codec.RedisCodec;
 
-public class RedisMap<K,V> implements Map<String, Integer> {
-    private RedisConnection<String, Integer> connection;
+public class RedisMap<K,V> implements Map<String, V> {
+    private RedisConnection<String, Object> connection;
     
     private RedisSet<String> keySet;
-    private RedisSet<Integer> valuesSet;
-    private RedisSet<Map.Entry<String, Integer>> entrySet;
-
+    private RedisSet<Object> valuesSet;
+    private RedisSet<Entry<String, Object>> entrySet;   
     
-    
-    public <K,V>RedisMap (RedisConnection<String, Integer> connection) {
+    public <K,V>RedisMap (RedisConnection<String, Object> connection) {
         this.connection = connection;
         keySet = new RedisSet<String>(connection, IteratorType.KEYSET);
-        entrySet = new RedisSet<Map.Entry<String, Integer>>(connection, IteratorType.ENTRYSET);
-        valuesSet = new RedisSet<Integer>(connection, IteratorType.VALUES);
+        entrySet = new RedisSet<Entry<String, Object>>(connection, IteratorType.ENTRYSET);
+        valuesSet = new RedisSet<Object>(connection, IteratorType.VALUES);
         
     }
 
@@ -48,19 +43,19 @@ public class RedisMap<K,V> implements Map<String, Integer> {
         return valuesSet.contains(value);
     }
 
-    public Integer get(Object key) {
-        return connection.get(key.toString());
+    public V get(Object key) {
+        return (V) connection.get(key.toString());
     }
 
     @Override
-    public Integer remove(Object key) {
-        Integer res = (Integer) connection.get((String) key);
+    public V remove(Object key) {
+        Object res = connection.get((String) key);
         connection.del((String)key);     
-        return res;
+        return (V) res;
     }
 
     public void putAll(Map m) {
-        m.forEach((key, value) -> connection.set(key.toString(), (Integer)value));
+        m.forEach((key, value) -> connection.set(key.toString(), value));
     }
 
     public void clear() {
@@ -81,14 +76,14 @@ public class RedisMap<K,V> implements Map<String, Integer> {
 
 
     @Override
-    public Integer put(String key, Integer value) {
+    public V put(String key, Object value) {
         if (connection.set(key, value).equals("OK"))
-            return value;
+            return (V) value;
         else
             return null;
     }
 
-    public RedisConnection<String, Integer> getConnection() {
+    public RedisConnection<String, Object> getConnection() {
         return connection;
     }
 
@@ -96,7 +91,7 @@ public class RedisMap<K,V> implements Map<String, Integer> {
      * The connection sets to all used Redis-connection data types
      * 
      */
-    public void setConnection(RedisConnection<String, Integer> connection) {
+    public void setConnection(RedisConnection<String, Object> connection) {
         entrySet.setConnection(connection);
         keySet.setConnection(connection);
         valuesSet.setConnection(connection);
