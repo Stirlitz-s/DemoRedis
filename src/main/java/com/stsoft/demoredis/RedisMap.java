@@ -5,25 +5,25 @@
  */
 
 package com.stsoft.demoredis;
+import com.lambdaworks.redis.RedisConnection;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
-import com.lambdaworks.redis.*;
-
-public class RedisMap<K,V> implements Map<String, V> {
+public class RedisMap<V> implements Map<String, V> {
     private RedisConnection<String, Object> connection;
     
-    private RedisSet<String> keySet;
-    private RedisSet<Object> valuesSet;
-    private RedisSet<Entry<String, Object>> entrySet;   
+    private final RedisSet<String> keySet;
+    private final RedisSet<?> valuesSet;
+    private final RedisSet<?> entrySet;
     
+    @SuppressWarnings("hiding")
     public <K,V>RedisMap (RedisConnection<String, Object> connection) {
         this.connection = connection;
-        keySet = new RedisSet<String>(connection, IteratorType.KEYSET);
-        entrySet = new RedisSet<Entry<String, Object>>(connection, IteratorType.ENTRYSET);
-        valuesSet = new RedisSet<Object>(connection, IteratorType.VALUES);
+        keySet = new RedisSet<>(connection, IteratorType.KEYSET);
+        entrySet = new RedisSet<>(connection, IteratorType.ENTRYSET);
+        valuesSet = new RedisSet<>(connection, IteratorType.VALUES);
         
     }
 
@@ -43,10 +43,12 @@ public class RedisMap<K,V> implements Map<String, V> {
         return valuesSet.contains(value);
     }
 
+    @SuppressWarnings("unchecked")
     public V get(Object key) {
         return (V) connection.get(key.toString());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public V remove(Object key) {
         Object res = connection.get((String) key);
@@ -54,27 +56,31 @@ public class RedisMap<K,V> implements Map<String, V> {
         return (V) res;
     }
 
-    public void putAll(Map m) {
-        m.forEach((key, value) -> connection.set(key.toString(), value));
+    @Override
+    public void putAll(Map<? extends String, ? extends V> m) {
+        m.forEach((key, value) -> connection.set(key, value));
     }
 
     public void clear() {
         connection.flushall();
     }
 
-    public Set keySet() {
+    public Set<String> keySet() {
         return keySet;
     }
 
-    public Collection values() {
-        return valuesSet;
+    @SuppressWarnings("unchecked")
+    public Collection<V> values() {
+        return (Collection<V>) valuesSet;
     }
 
-    public Set entrySet() {
-        return entrySet;
+    @SuppressWarnings("unchecked")
+    public Set<Entry<String, V>> entrySet() {
+        return (Set<Entry<String, V>>) entrySet;
     }
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public V put(String key, Object value) {
         if (connection.set(key, value).equals("OK"))

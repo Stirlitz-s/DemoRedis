@@ -7,17 +7,14 @@ import com.lambdaworks.redis.RedisConnection;
 import com.lambdaworks.redis.RedisURI;
 import com.lambdaworks.redis.codec.RedisCodec;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 
-public class RedisMapTestPut {
+public class RedisMapTestStrIntPut {
     @Test
     public void mapTestPut() {
         RedisClient redisClient = new RedisClient(
@@ -25,7 +22,7 @@ public class RedisMapTestPut {
         RedisCodec<String, Object> redisCodec = new CodecStrInt(); 
         RedisConnection<String, Object> connection = redisClient.connect(redisCodec);
 
-        RedisMap<String, Integer> actual = new RedisMap<>(connection);
+        RedisMap<Integer> actual = new RedisMap<>(connection);
         actual.clear();
         actual.put("zero", 0);
         actual.put("one", 1);

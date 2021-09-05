@@ -4,23 +4,21 @@
  */
 package com.stsoft.demoredis;
 
-import java.util.AbstractMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
 import com.lambdaworks.redis.KeyScanCursor;
 import com.lambdaworks.redis.RedisConnection;
 import com.lambdaworks.redis.ScanArgs;
 
-public class RedisIterator<E> implements Iterator<Object> {
+import java.util.AbstractMap;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class RedisIterator<E> implements Iterator<E> {
     
-    private RedisConnection<String, Object> connection;
-    private IteratorType type;
+    private final RedisConnection<String, Object> connection;
+    private final IteratorType type;
     private KeyScanCursor<String> cursor = null;
     private String prevKey = null;
-    private ScanArgs scanArgs = null;
+    private final ScanArgs scanArgs;
     private int currentIndexOfList = 0;
     
     
@@ -38,8 +36,9 @@ public class RedisIterator<E> implements Iterator<Object> {
         return !(cursor.isFinished() && (currentIndexOfList >= cursor.getKeys().size()));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Object next() {
+    public E next() {
         if (cursor.isFinished() && (currentIndexOfList >= cursor.getKeys().size())) {
             throw new NoSuchElementException();
         }
@@ -50,19 +49,13 @@ public class RedisIterator<E> implements Iterator<Object> {
             cursor = connection.scan(cursor, scanArgs);
             currentIndexOfList = 0;
         } 
-        prevKey = new String(key);
+        prevKey = key;
         cursor = connection.scan(cursor, scanArgs);
-        switch (type) {
-            case KEYSET:
-                return key;
-            case ENTRYSET:;
-                Map.Entry<String, Object> entry = new AbstractMap.SimpleEntry<>(key, connection.get(key));
-                return entry;
-            case VALUES:;
-                return connection.get(key);
-            default:
-                throw new NoSuchElementException();
-        }
+        return switch (type) {
+            case KEYSET -> (E) key;
+            case ENTRYSET -> (E) new AbstractMap.SimpleEntry<>(key, connection.get(key));
+            case VALUES -> (E) connection.get(key);
+        };
     }
     
     public String getCurrentKey() {

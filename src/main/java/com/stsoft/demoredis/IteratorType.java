@@ -1,7 +1,7 @@
 package com.stsoft.demoredis;
 
 public enum IteratorType {
-    KEYSET,
     ENTRYSET,
+    KEYSET,
     VALUES
 }

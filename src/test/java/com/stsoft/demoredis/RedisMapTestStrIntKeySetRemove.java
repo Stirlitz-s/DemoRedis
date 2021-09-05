@@ -3,13 +3,8 @@ package com.stsoft.demoredis;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 import org.junit.Test;
@@ -19,15 +14,15 @@ import com.lambdaworks.redis.RedisConnection;
 import com.lambdaworks.redis.RedisURI;
 import com.lambdaworks.redis.codec.RedisCodec;
 
-public class RedisMapTestKeySetRemove {
+public class RedisMapTestStrIntKeySetRemove {
     @Test
-    public void mapTestKeySetAddRemove() {
+    public void mapTestKeySetRemove() {
         RedisClient redisClient = new RedisClient(
         RedisURI.create("redis://127.0.0.1:6379"));
         RedisCodec<String, Object> redisCodec = new CodecStrInt(); 
         RedisConnection<String, Object> connection = redisClient.connect(redisCodec);
 
-        RedisMap<String, Integer> actual = new RedisMap<>(connection);
+        RedisMap<Integer> actual = new RedisMap<>(connection);
         actual.clear();
         actual.put("zero", 0);
         actual.put("one", 1);

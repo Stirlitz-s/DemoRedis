@@ -4,11 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.AbstractMap;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -19,15 +15,15 @@ import com.lambdaworks.redis.RedisConnection;
 import com.lambdaworks.redis.RedisURI;
 import com.lambdaworks.redis.codec.RedisCodec;
 
-public class RedisMapTestEntrySetRemove {
+public class RedisMapTestStrIntEntrySetRemove {
     @Test
-    public void mapTestEntrySetAddRemove() {
+    public void mapTestEntrySetRemove() {
         RedisClient redisClient = new RedisClient(
         RedisURI.create("redis://127.0.0.1:6379"));
         RedisCodec<String, Object> redisCodec = new CodecStrInt(); 
         RedisConnection<String, Object> connection = redisClient.connect(redisCodec);
 
-        RedisMap<String, Integer> actual = new RedisMap<>(connection);
+        RedisMap<Integer> actual = new RedisMap<>(connection);
         actual.clear();
         actual.put("zero", 0);
         actual.put("one", 1);

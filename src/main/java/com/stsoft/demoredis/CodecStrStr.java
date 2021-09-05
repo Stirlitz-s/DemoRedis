@@ -1,12 +1,11 @@
 package com.stsoft.demoredis;
 
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 
 import com.lambdaworks.redis.codec.RedisCodec;
 
-public class CodecStrInt extends RedisCodec<String, Object> {
+public class CodecStrStr extends RedisCodec<String, Object> {
     
     @Override
     public String decodeKey(ByteBuffer bytes) {
@@ -15,8 +14,7 @@ public class CodecStrInt extends RedisCodec<String, Object> {
 
     @Override
     public Object decodeValue(ByteBuffer bytes) {
-        final CharBuffer charSequence = StandardCharsets.UTF_8.decode(bytes);
-        return Integer.parseInt(charSequence, 0, charSequence.length(), 10);
+        return StandardCharsets.UTF_8.decode(bytes).toString();
     }
 
     @Override
@@ -26,6 +24,6 @@ public class CodecStrInt extends RedisCodec<String, Object> {
 
     @Override
     public byte[] encodeValue(final Object value) {
-        return ByteBuffer.wrap(Integer.toString((Integer)value).getBytes()).array();
+        return StandardCharsets.UTF_8.encode((String)value).array();
     }
 }
